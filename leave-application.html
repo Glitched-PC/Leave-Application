@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leave Application – Instant Prints</title>
+<style>
+:root{--bg:#fbf7ef;--fg:#1b1a17;--mut:#6d675c;--card:#fff;--line:#e5ddcc;--acc:#e8531e;--ok:#1f8a4c;--bad:#c62828;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#14130f;--fg:#f4efe3;--mut:#a39d8f;--card:#1e1c17;--line:#34312a;--acc:#ff7a45;--ok:#4fcf84;--bad:#ff7b7b;color-scheme:dark}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,'Times New Roman',serif;line-height:1.5}
+.hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:32px 24px;position:relative;overflow:hidden;max-width:900px;margin:0 auto}
+.hero h1{font-size:clamp(3.2rem,14vw,7.5rem);line-height:.92;margin:0;letter-spacing:-.04em}
+.hero h1 span{color:var(--acc);font-style:italic}
+.hero p{font-size:clamp(1.05rem,3vw,1.35rem);max-width:32ch;color:var(--mut);margin:20px 0}
+.pill{display:inline-block;font:600 .8rem system-ui,sans-serif;border:1px solid var(--line);border-radius:99px;padding:6px 12px;margin:0 8px 8px 0;background:var(--card)}
+.cta{font:700 1rem system-ui,sans-serif;background:var(--acc);color:#fff;border:0;border-radius:99px;padding:14px 26px;cursor:pointer;width:max-content;text-decoration:none}
+.sheet{position:absolute;right:10px;top:14%;width:180px;height:240px;background:var(--card);border:1px solid var(--line);transform:rotate(8deg);box-shadow:0 20px 50px #0002;opacity:.85;padding:18px;pointer-events:none}
+.sheet i{display:block;height:6px;background:var(--line);margin:10px 0;border-radius:3px}
+.sheet i:first-child{width:60%;background:var(--acc)}
+main{max-width:600px;margin:0 auto;padding:20px 18px 80px;font-family:system-ui,sans-serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:18px}
+.card h2{font:700 1.3rem Georgia,serif;margin:0 0 4px}
+.card h2 b{color:var(--acc);margin-right:8px}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 14px}
+label{display:block;font-size:.85rem;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg)}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px}
+.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.row>.sm{flex:0 0 95px}
+.item{border:1px dashed var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.item h3{margin:0 0 6px;font-size:1rem;display:flex;justify-content:space-between;gap:8px}
+.x{background:none;border:0;color:var(--bad);cursor:pointer;font-size:.85rem;font-weight:600}
+.btn{font:700 1rem system-ui,sans-serif;background:var(--acc);color:#fff;border:0;border-radius:12px;padding:14px;width:100%;cursor:pointer;margin-top:16px}
+.btn.alt{background:var(--card);color:var(--fg);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.err{color:var(--bad);font-size:.85rem;margin-top:8px;min-height:1em}
+.low{color:var(--mut);font-size:.8rem;margin-top:6px}.low.warn{color:var(--bad);font-weight:600}
+.total{display:flex;justify-content:space-between;font-size:1.15rem;font-weight:700;padding-top:12px;border-top:1px solid var(--line);margin-top:14px}
+.paper{background:#fff;color:#222;border:1px solid #ccc;padding:16px;font:.78rem Georgia,serif;border-radius:6px;box-shadow:0 6px 18px #0001}
+.paper h4{text-align:center;margin:0 0 8px;font-size:.9rem;text-decoration:underline}
+.paper i{display:block;height:5px;background:#ddd;margin:8px 0;border-radius:3px}
+.chk{display:flex;gap:10px;margin-top:10px;font-size:.9rem}
+.chk label{display:flex;gap:6px;align-items:center;margin:0;font-weight:500;flex:1;border:1px solid var(--line);padding:10px;border-radius:10px;cursor:pointer}
+.chk input{width:auto}
+.qr-wrap{text-align:center;background:#e44c2e;padding:16px;border-radius:16px;margin:14px 0;color:#fff}
+.qr-wrap img{width:100%;max-width:260px;border-radius:12px;display:block;margin:0 auto}
+.upi-pill{display:inline-flex;align-items:center;gap:8px;background:#0003;padding:6px 14px;border-radius:99px;font-size:.85rem;margin-top:10px;cursor:pointer;border:1px solid #fff4}
+.ok{text-align:center;padding:24px 10px}.ok .big{font-size:3rem}
+.hide{display:none}
+.price{font-size:.8rem;color:var(--mut);display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.price span{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.track{text-align:left;margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
+.stp{display:flex;gap:12px;align-items:flex-start;padding:8px 0;opacity:.4}
+.stp.on{opacity:1}.stp.now b{color:var(--acc)}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.8rem;flex:0 0 26px}
+.stp.on .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp.now .dot{background:var(--acc);border-color:var(--acc);animation:p 1.4s infinite}
+@keyframes p{50%{box-shadow:0 0 0 8px #e8531e22}}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="sheet"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div><span class="pill">⚡ Ready in ~10 min</span><span class="pill">₹4 per copy</span></div>
+  <h1>Leave<br><span>Application.</span></h1>
+  <p>Skip the xerox queue. Pick your department, pay via UPI, and collect at your spot.</p>
+  <a class="cta" href="#order">Get yours →</a>
+</section>
+
+<main id="order">
+  <div class="card" id="s1">
+    <h2><b>1</b>Your details</h2>
+    <p class="sub">So we know who to hand it to.</p>
+    <label>Full name</label><input id="name" autocomplete="name" placeholder="Enter your full name">
+    <label>Student ID</label><input id="sid" placeholder="e.g. NIMS2026001">
+    <label>Mobile number</label><input id="mob" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+    <label>Pickup location</label><select id="loc"><option value="">Choose where you’ll be standing…</option></select>
+  </div>
+
+  <div class="card" id="s2">
+    <h2><b>2</b>Pick your leave applications</h2>
+    <p class="sub">Add one or more departments, then choose how many copies of each.</p>
+    <select id="addDept"><option value="">Loading live stock…</option></select>
+    <div id="items"></div>
+    <div class="price" id="priceTbl"></div>
+    <div class="total"><span>Total</span><span id="tot">₹0</span></div>
+    <div class="err" id="e2"></div>
+    <button class="btn" id="toPrev">Preview my selection →</button>
+  </div>
+
+  <div class="card hide" id="s3">
+    <h2><b>3</b>Is this the one?</h2>
+    <p class="sub">Confirm each sheet before you pay.</p>
+    <div id="prev"></div>
+    <div class="err" id="e3"></div>
+    <button class="btn" id="toPay">Continue to payment →</button>
+    <button class="btn alt" id="back">← Edit selection</button>
+  </div>
+
+  <div class="card hide" id="s4">
+    <h2><b>4</b>Pay &amp; collect</h2>
+    <p class="sub">Scan the QR below in any UPI app and pay the exact total.</p>
+    <div id="sum"></div>
+    <div class="total"><span>Amount to Pay</span><span id="payAmt"></span></div>
+
+    <div class="qr-wrap">
+      <img src="qr.jpg" alt="Scan to pay via UPI">
+      <div class="upi-pill" id="copyUpi">UPI ID: <b>7016021108@fam</b> 📋</div>
+    </div>
+
+    <label>Last 4 digits of UPI Ref / UTR (optional)</label>
+    <input id="utr" inputmode="numeric" maxlength="6" placeholder="Helps verify faster">
+
+    <p class="sub" style="margin-top:10px">After completing payment, tap below. Keep your phone handy for live status updates.</p>
+    <button class="btn" id="paid">I’ve paid ✓</button>
+    <button class="btn alt" id="backPay">← Back</button>
+  </div>
+
+  <div class="card hide ok" id="done">
+    <div class="big">🎉</div>
+    <h2 style="font-size:1.5rem">Order placed!</h2>
+    <p id="doneMsg" class="sub"></p>
+    <div id="track" class="track"></div>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, onSnapshot, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ===== 1. PASTE YOUR FIREBASE CONFIG HERE ===== */
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDdSyAY6qoWzure5pPw5G3inMBKLrmX2bk",
+  authDomain: "leave-application-ec8ce.firebaseapp.com",
+  projectId: "leave-application-ec8ce",
+  storageBucket: "leave-application-ec8ce.firebasestorage.app",
+  messagingSenderId: "858593039943",
+  appId: "1:858593039943:web:a0da666b8d1b70e5480362",
+  measurementId: "G-JG9G0213XC"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+/* ===== 2. STORE SETTINGS ===== */
+const DEPTS = ["B.Tech CSE","B.Tech ECE","B.Tech ME","B.Tech CE","BBA","B.Com","BCA","B.Pharm","LLB","MBA"];
+const LOCS = ["Main Gate","Library","Canteen","Hostel Block A","Admin Block"];
+const UPI_ID = "7016021108@fam";
+const PRICES = {1:4, 2:8, 3:12, 4:16, 5:19, 6:24, 7:28, 8:32, 9:35, 10:38};
+const EXTRA_RATE = 4;
+/* ============================================ */
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+const price = n => PRICES[n] ?? (n > 10 ? EXTRA_RATE * n : 0);
+const slug = d => d.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+
+let stock = {}, sel = {}, conf = {};
+
+LOCS.forEach(l => $('loc').add(new Option(l, l)));
+$('priceTbl').innerHTML = Object.entries(PRICES).map(([n,p]) => `<span>${n} = ₹${p}</span>`).join('') + `<span>11+ = ₹${EXTRA_RATE} each</span>`;
+
+$('copyUpi').onclick = () => {
+  navigator.clipboard?.writeText(UPI_ID);
+  $('copyUpi').innerHTML = `Copied <b>${UPI_ID}</b> ✓`;
+  setTimeout(() => $('copyUpi').innerHTML = `UPI ID: <b>${UPI_ID}</b> 📋`, 2000);
+};
+
+/* Live stock listener */
+onSnapshot(collection(db, "stock"), snap => {
+  const m = {};
+  snap.forEach(d => m[d.data().dept] = d.data().count);
+  stock = m;
+  upd(true);
+});
+
+function renderAdd() {
+  const s = $('addDept');
+  s.innerHTML = '<option value="">+ Add a department…</option>';
+  DEPTS.forEach(d => {
+    const n = stock[d] || 0;
+    const o = new Option(`${d} — ${n > 0 ? n + ' left' : 'out of stock (0)'}`, d);
+    o.disabled = n <= 0 || d in sel;
+    s.add(o);
+  });
+}
+
+function renderItems() {
+  $('items').innerHTML = '';
+  Object.keys(sel).forEach(d => {
+    const q = sel[d], left = stock[d] || 0;
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
+      <h3><span>${d}</span><button class="x">Remove</button></h3>
+      <label style="margin-top:0">How many copies for ${d}?</label>
+      <div class="row"><select></select><input class="sm" type="number" min="1" placeholder="Other"></div>
+      <div class="low ${q > left ? 'warn' : ''}">${left} in stock${q > left ? ' — reduce your quantity' : ''}</div>`;
+    const se = div.querySelector('select'), inp = div.querySelector('input');
+    for (let i = 1; i <= 10; i++) se.add(new Option(`${i} LA — ₹${price(i)}`, i));
+    se.add(new Option('More than 10…', 'm'));
+    if (q <= 10) { se.value = q; } else { se.value = 'm'; inp.value = q; }
+    se.onchange = () => { if (se.value === 'm') inp.focus(); else { sel[d] = +se.value; inp.value = ''; upd(); } };
+    inp.oninput = () => {
+      const v = Math.max(0, parseInt(inp.value) || 0);
+      if (!v) return;
+      if (v <= 10) { sel[d] = v; se.value = v; inp.value = ''; } else { sel[d] = v; se.value = 'm'; }
+      upd(true);
+    };
+    div.querySelector('.x').onclick = () => { delete sel[d]; upd(); };
+    $('items').append(div);
+  });
+}
+
+function total() { return Object.values(sel).reduce((a, q) => a + price(q), 0); }
+
+function upd(keep) {
+  if (!keep) renderItems();
+  renderAdd();
+  $('tot').textContent = '₹' + total();
+  document.querySelectorAll('.item .low').forEach((el, i) => {
+    const d = Object.keys(sel)[i];
+    if (d) {
+      const over = sel[d] > (stock[d] || 0);
+      el.className = 'low' + (over ? ' warn' : '');
+      el.textContent = `${stock[d] || 0} in stock${over ? ' — reduce your quantity' : ''}`;
+    }
+  });
+}
+
+$('addDept').onchange = e => { if (e.target.value) { sel[e.target.value] = 1; upd(); } };
+
+function valid() {
+  const m = $('mob').value.trim();
+  if (!$('name').value.trim()) return 'Please enter your full name.';
+  if (!$('sid').value.trim()) return 'Please enter your student ID.';
+  if (!/^\d{10}$/.test(m)) return 'Enter a valid 10-digit mobile number.';
+  if (!$('loc').value) return 'Choose a pickup location.';
+  if (!Object.keys(sel).length) return 'Add at least one department.';
+  for (const d in sel) if (sel[d] > (stock[d] || 0)) return `Only ${stock[d] || 0} left for ${d}.`;
+  return '';
+}
+
+function go(step) {
+  $('s1').classList.toggle('hide', step > 2);
+  $('s2').classList.toggle('hide', step > 2);
+  $('s3').classList.toggle('hide', step !== 3);
+  $('s4').classList.toggle('hide', step !== 4);
+  $('done').classList.toggle('hide', step !== 5);
+  $('order').scrollIntoView();
+}
+
+$('toPrev').onclick = () => { const e = valid(); $('e2').textContent = e; if (!e) { renderPrev(); go(3); } };
+$('back').onclick = () => go(1);
+$('backPay').onclick = () => go(3);
+
+function renderPrev() {
+  conf = {}; $('prev').innerHTML = '';
+  Object.keys(sel).forEach(d => {
+    conf[d] = null;
+    const w = document.createElement('div'); w.className = 'item';
+    w.innerHTML = `
+      <div class="paper"><h4>LEAVE APPLICATION — ${d.toUpperCase()}</h4><i></i><i></i><i style="width:70%"></i><i></i><i style="width:50%"></i></div>
+      <div class="chk"><label><input type="checkbox" class="y"> Yes, this is the one</label><label><input type="checkbox" class="n"> No, not this one</label></div>
+      <div class="alt hide"><label>Choose the correct department</label><select></select></div>`;
+    const y = w.querySelector('.y'), n = w.querySelector('.n'), alt = w.querySelector('.alt'), s = w.querySelector('select');
+    y.onchange = () => { if (y.checked) { n.checked = false; alt.classList.add('hide'); conf[d] = true; } else conf[d] = null; };
+    n.onchange = () => {
+      if (n.checked) {
+        y.checked = false; conf[d] = false; alt.classList.remove('hide');
+        s.innerHTML = '<option value="">Pick another…</option>';
+        DEPTS.forEach(x => { if (x !== d && !(x in sel) && (stock[x] || 0) > 0) s.add(new Option(x, x)); });
+      } else { alt.classList.add('hide'); conf[d] = null; }
+    };
+    s.onchange = () => {
+      const x = s.value; if (!x) return;
+      const ns = {}; Object.keys(sel).forEach(k => ns[k === d ? x : k] = sel[k]);
+      sel = ns; renderItems(); upd(); renderPrev();
+    };
+    $('prev').append(w);
+  });
+}
+
+$('toPay').onclick = () => {
+  const bad = Object.keys(conf).some(d => conf[d] !== true);
+  $('e3').textContent = bad ? 'Please confirm “Yes, this is the one” for every sheet.' : '';
+  if (bad) return;
+  const amt = total();
+  $('sum').innerHTML = Object.keys(sel).map(d => `<div class="row" style="margin:4px 0"><span>${d} × ${sel[d]}</span><span style="text-align:right;flex:0 0 70px">₹${price(sel[d])}</span></div>`).join('');
+  $('payAmt').textContent = '₹' + amt;
+  go(4);
+};
+
+$('paid').onclick = async () => {
+  $('paid').disabled = true;
+  const e = valid();
+  if (e) { alert(e); $('paid').disabled = false; return; }
+
+  const orderId = 'ORD_' + Date.now() + '_' + Math.floor(Math.random() * 900 + 100);
+  const copiesCount = Object.values(sel).reduce((a, b) => a + b, 0);
+  const order = {
+    name: $('name').value.trim(),
+    sid: $('sid').value.trim(),
+    mobile: $('mob').value.trim(),
+    loc: $('loc').value,
+    utr: $('utr').value.trim(),
+    items: { ...sel },
+    amount: total(),
+    ts: Date.now(),
+    state: 'received',
+    eta: 10
+  };
+
+  try {
+    /* Atomically verify and deduct stock */
+    await runTransaction(db, async tx => {
+      const reads = [];
+      for (const d of Object.keys(sel)) {
+        const ref = doc(db, "stock", slug(d));
+        const snap = await tx.get(ref);
+        const cur = snap.exists() ? snap.data().count : 0;
+        if (cur < sel[d]) throw `Sorry, only ${cur} left for ${d}.`;
+        reads.push({ ref, d, next: cur - sel[d] });
+      }
+      for (const r of reads) tx.set(r.ref, { dept: r.d, count: r.next });
+    });
+
+    await setDoc(doc(db, "orders", orderId), order);
+    localStorage.setItem('activeOrderId', orderId);
+    watchOrder(orderId);
+
+    $('doneMsg').textContent = `Thanks ${order.name.split(' ')[0]}! Collect ${copiesCount} copy(ies) at ${order.loc}. Keep your student ID handy.`;
+    sel = {};
+    go(5);
+  } catch (err) {
+    alert(typeof err === 'string' ? err : 'Could not place order. Please check stock and try again.');
+    $('paid').disabled = false;
+  }
+};
+
+/* Live Tracker */
+const STEPS = [
+  ['received', 'Order received', 'We’ve got your order and payment details.'],
+  ['picked', 'Leave Applications picked', 'Your copies are picked and packed.'],
+  ['onway', 'On the way', ''],
+  ['delivered', 'Delivered', 'Enjoy! Have a great day.']
+];
+
+function renderTrack(st) {
+  const state = st?.state || 'received', eta = +st?.eta || 0;
+  const idx = STEPS.findIndex(x => x[0] === state);
+  $('track').innerHTML = STEPS.map((x, i) => {
+    const t = x[0] === 'onway' ? (eta > 0 ? `Reaching you in ${eta} min${eta > 1 ? 's' : ''}` : 'Reaching you soon') : x[1];
+    const sub = x[0] === 'onway' ? 'Stay at your pickup spot.' : x[2];
+    return `<div class="stp ${i <= idx ? 'on' : ''} ${i === idx ? 'now' : ''}">
+      <div class="dot">${i < idx || state === 'delivered' ? '✓' : i + 1}</div>
+      <div><b>${t}</b><div class="sub" style="margin:0">${sub}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function watchOrder(id) {
+  onSnapshot(doc(db, "orders", id), snap => {
+    if (snap.exists()) {
+      const d = snap.data();
+      renderTrack(d);
+      if (d.state === 'delivered') localStorage.removeItem('activeOrderId');
+    }
+  });
+}
+
+/* Resume tracking if student refreshes page */
+const savedId = localStorage.getItem('activeOrderId');
+if (savedId) {
+  $('doneMsg').textContent = 'Tracking your active order…';
+  watchOrder(savedId);
+  go(5);
+}
+</script>
+</body>
+</html>

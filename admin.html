@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Owner &amp; Team Portal – Leave Prints</title>
+<style>
+:root{--bg:#14130f;--fg:#f4efe3;--mut:#a39d8f;--card:#1e1c17;--line:#34312a;--acc:#ff7a45;--ok:#4fcf84;--bad:#ff7b7b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;line-height:1.5}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font:700 1.2rem Georgia,serif;margin:0}
+header h1 span{color:var(--acc)}
+main{max-width:960px;margin:0 auto;padding:20px 16px 80px}
+.login-box{max-width:400px;margin:80px auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
+.login-box h2{font:700 1.5rem Georgia,serif;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
+.card h2{font:700 1.25rem Georgia,serif;margin:0 0 4px}
+.sub{color:var(--mut);font-size:.88rem;margin:0 0 14px}
+label{display:block;font-size:.82rem;font-weight:600;margin:12px 0 4px;color:var(--mut)}
+input,select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);width:100%}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px}
+.btn{font:700 .95rem system-ui,sans-serif;background:var(--acc);color:#fff;border:0;border-radius:10px;padding:12px 16px;cursor:pointer;width:100%;margin-top:14px}
+.btn.sm{width:auto;padding:7px 12px;font-size:.82rem;margin:0}
+.btn.alt{background:transparent;border:1px solid var(--line);color:var(--fg)}
+.err{color:var(--bad);font-size:.85rem;margin-top:10px}
+.hide{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.stk-item{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--line);padding:10px 12px;border-radius:10px}
+.stk-item input{width:76px;text-align:center;padding:6px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.75rem;font-weight:700;text-transform:uppercase}
+.b-received{background:#ff7a4522;color:var(--acc)}
+.b-picked{background:#3b82f622;color:#60a5fa}
+.b-onway{background:#eab30822;color:#facc15}
+.b-delivered{background:#4fcf8422;color:var(--ok)}
+.ctrl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ctrl select{width:auto;padding:6px 8px;font-size:.82rem}
+.ctrl input{width:64px;padding:6px 8px;font-size:.82rem}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{background:var(--bg);border:1px solid var(--line);color:var(--mut);padding:6px 14px;border-radius:99px;cursor:pointer;font-size:.85rem;font-weight:600}
+.tab.active{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginView" class="login-box">
+  <h2>Team Access</h2>
+  <p class="sub">Sign in with the credentials assigned by the owner.</p>
+  <form id="loginForm">
+    <label>Username / Email</label>
+    <input id="email" type="email" required placeholder="member@leaveprints.com">
+    <label>Password</label>
+    <input id="pass" type="password" required placeholder="••••••••">
+    <button class="btn" type="submit" id="loginBtn">Sign in →</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashView" class="hide">
+  <header>
+    <h1>Leave <span>Admin.</span></h1>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="who" style="font-size:.82rem;color:var(--mut)"></span>
+      <button class="btn sm alt" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- LIVE ORDERS -->
+    <div class="card">
+      <h2>Live Orders</h2>
+      <p class="sub">Update status and ETA—customers see changes immediately.</p>
+      <div class="tabs">
+        <button class="tab active" data-f="active">Active Orders</button>
+        <button class="tab" data-f="delivered">Delivered</button>
+        <button class="tab" data-f="all">All</button>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Department &amp; Qty</th>
+              <th>Paid</th>
+              <th>Pickup Spot</th>
+              <th>Status &amp; ETA</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="card">
+      <h2>Inventory Management</h2>
+      <p class="sub">Set available copies per department. Stock drops automatically when students order.</p>
+      <div class="grid" id="stockGrid"></div>
+      <button class="btn" id="saveStock" style="max-width:240px">Save Stock Changes</button>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ===== PASTE THE EXACT SAME FIREBASE CONFIG HERE ===== */
+// Import the functions you need from the SDKs you need
+
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDdSyAY6qoWzure5pPw5G3inMBKLrmX2bk",
+  authDomain: "leave-application-ec8ce.firebaseapp.com",
+  projectId: "leave-application-ec8ce",
+  storageBucket: "leave-application-ec8ce.firebasestorage.app",
+  messagingSenderId: "858593039943",
+  appId: "1:858593039943:web:a0da666b8d1b70e5480362",
+  measurementId: "G-JG9G0213XC"
+};
+
+// Initialize Firebase
+
+const DEPTS = ["B.Tech CSE","B.Tech ECE","B.Tech ME","B.Tech CE","BBA","B.Com","BCA","B.Pharm","LLB","MBA"];
+/* ==================================================== */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+const slug = d => d.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+const esc = s => String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let stock = {}, allOrders = [], filter = 'active', unsubStock = null, unsubOrders = null;
+
+/* Auth handling */
+$('loginForm').onsubmit = async e => {
+  e.preventDefault();
+  $('loginErr').textContent = '';
+  $('loginBtn').disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, $('email').value.trim(), $('pass').value);
+  } catch (err) {
+    $('loginErr').textContent = 'Invalid username or password.';
+    $('loginBtn').disabled = false;
+  }
+};
+
+$('logoutBtn').onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    $('loginView').classList.add('hide');
+    $('dashView').classList.remove('hide');
+    $('who').textContent = user.email;
+    startListeners();
+  } else {
+    $('loginView').classList.remove('hide');
+    $('dashView').classList.add('hide');
+    $('loginBtn').disabled = false;
+    if (unsubStock) unsubStock();
+    if (unsubOrders) unsubOrders();
+  }
+});
+
+function startListeners() {
+  unsubStock = onSnapshot(collection(db, "stock"), snap => {
+    const m = {};
+    snap.forEach(d => m[d.data().dept] = d.data().count);
+    stock = m;
+    renderStock();
+  });
+
+  const q = query(collection(db, "orders"), orderBy("ts", "desc"));
+  unsubOrders = onSnapshot(q, snap => {
+    allOrders = [];
+    snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+    renderOrders();
+  });
+}
+
+function renderStock() {
+  $('stockGrid').innerHTML = DEPTS.map(d => `
+    <div class="stk-item">
+      <span>${d}</span>
+      <input type="number" min="0" value="${stock[d] ?? 0}" data-d="${d}">
+    </div>`).join('');
+}
+
+$('saveStock').onclick = async () => {
+  const btn = $('saveStock');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  for (const inp of document.querySelectorAll('#stockGrid input')) {
+    const dept = inp.dataset.d;
+    const count = Math.max(0, parseInt(inp.value) || 0);
+    await setDoc(doc(db, "stock", slug(dept)), { dept, count });
+  }
+  btn.textContent = 'Saved ✓'; btn.disabled = false;
+  setTimeout(() => btn.textContent = 'Save Stock Changes', 1500);
+};
+
+/* Tabs */
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    filter = t.dataset.f;
+    renderOrders();
+  };
+});
+
+function renderOrders() {
+  const list = allOrders.filter(o => {
+    if (filter === 'active') return o.state !== 'delivered';
+    if (filter === 'delivered') return o.state === 'delivered';
+    return true;
+  });
+
+  if (!list.length) {
+    $('ordersBody').innerHTML = `<tr><td colspan="5" style="color:var(--mut);text-align:center;padding:20px">No orders in this view.</td></tr>`;
+    return;
+  }
+
+  $('ordersBody').innerHTML = list.map(o => {
+    const time = new Date(o.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const items = Object.entries(o.items || {}).map(([k, v]) => `${esc(k)} × <b>${v}</b>`).join('<br>');
+    return `<tr>
+      <td><b>${esc(o.name)}</b><br><span style="color:var(--mut)">${esc(o.sid)} · ${esc(o.mobile)}</span><br><span style="font-size:.75rem;color:var(--mut)">${time}</span></td>
+      <td>${items}</td>
+      <td><b>₹${o.amount}</b>${o.utr ? `<br><span style="font-size:.75rem;color:var(--mut)">UTR: ${esc(o.utr)}</span>` : ''}</td>
+      <td><b>${esc(o.loc)}</b></td>
+      <td>
+        <div style="margin-bottom:6px"><span class="badge b-${o.state}">${o.state}</span></div>
+        <div class="ctrl" data-id="${o.id}">
+          <select class="st">
+            <option value="received" ${o.state === 'received' ? 'selected' : ''}>Received</option>
+            <option value="picked" ${o.state === 'picked' ? 'selected' : ''}>Picked</option>
+            <option value="onway" ${o.state === 'onway' ? 'selected' : ''}>On the way</option>
+            <option value="delivered" ${o.state === 'delivered' ? 'selected' : ''}>Delivered</option>
+          </select>
+          <input class="eta" type="number" min="0" placeholder="mins" value="${o.eta || ''}" title="ETA in minutes">
+          <button class="btn sm updBtn">Update</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+$('ordersBody').onclick = async e => {
+  const btn = e.target.closest('.updBtn');
+  if (!btn) return;
+  const wrap = btn.closest('.ctrl');
+  const id = wrap.dataset.id;
+  const state = wrap.querySelector('.st').value;
+  const eta = Math.max(0, parseInt(wrap.querySelector('.eta').value) || 0);
+  btn.disabled = true; btn.textContent = '…';
+  await updateDoc(doc(db, "orders", id), { state, eta });
+  btn.textContent = '✓';
+  setTimeout(() => { btn.textContent = 'Update'; btn.disabled = false; }, 1000);
+};
+</script>
+</body>
+</html>
